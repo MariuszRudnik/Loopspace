@@ -26,6 +26,6 @@ Poniższe funkcjonalności są rozważane jako rozszerzenia w kolejnych wersjach
 
 ## Kryteria sukcesu
 
-Sukcesem MVP będzie możliwość uruchomienia i poprowadzenia pierwszych kursów, w szczególności **kursów z serii 10xdev**. Aplikacja zostanie udostępniona jako projekt open-source, co oznacza, że każda osoba lub organizacja będzie mogła ją samodzielnie zainstalować i rozwijać.
+Aplikacja zostanie udostępniona jako projekt open-source, co oznacza, że każda osoba lub organizacja będzie mogła ją samodzielnie zainstalować i rozwijać.
 
-Dodatkowym wskaźnikiem sukcesu będzie zainteresowanie projektem ze strony społeczności — zarówno użytkowników, którzy chcą korzystać z Loopspace, jak i programistów chcących współtworzyć jego rozwój.
+Wskaźnikiem sukcesu będzie zainteresowanie projektem ze strony społeczności — zarówno użytkowników, którzy chcą korzystać z Loopspace, jak i programistów chcących współtworzyć jego rozwój.
