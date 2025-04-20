@@ -2,6 +2,7 @@ import type { ReactNode } from "react"
 
 import DashboardSidebar from "@/components/dashboard-sidebar"
 import DashboardNavbar from "@/components/dashboard-navbar"
+import { AIChatBot } from "@/components/ai-chat-bot"
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
@@ -11,6 +12,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         <DashboardSidebar />
         <main className="flex-1 p-6">{children}</main>
       </div>
+      <AIChatBot />
     </div>
   )
 }

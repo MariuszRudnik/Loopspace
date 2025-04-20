@@ -26,9 +26,9 @@ export default function CourseCard({ course }: CourseCardProps) {
       </CardContent>
       <CardFooter className="border-t bg-muted/50 p-3">
         <div className="flex w-full items-center justify-between">
-          <Link href={`/dashboard/courses/${course.id}`}>
+          <Link href={`/dashboard/courses/${course.id}/lessons`}>
             <Button variant="outline" size="sm">
-              Zarządzaj
+              Lekcje
             </Button>
           </Link>
         </div>
