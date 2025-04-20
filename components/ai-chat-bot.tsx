@@ -38,7 +38,7 @@ export function AIChatBot() {
 
     if (!input.trim()) return
 
-    // Dodaj wiadomość użytkownika
+
     const userMessage: Message = {
       id: Date.now().toString(),
       content: input,
