@@ -69,7 +69,7 @@ export default function DashboardNavbar() {
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <button className="flex w-full">
+              <button className="flex w-full" onClick={()=> console.log('ss')}>
                 Wyloguj się
               </button>
             </DropdownMenuItem>
