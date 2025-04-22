@@ -69,9 +69,9 @@ export default function DashboardNavbar() {
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <Link href="/" className="flex w-full">
+              <button className="flex w-full">
                 Wyloguj się
-              </Link>
+              </button>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

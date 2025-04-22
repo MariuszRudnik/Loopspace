@@ -1,7 +1,6 @@
-
 import type { Metadata } from 'next';
 import './globals.css';
-import Provider from './provider';
+import { Providers } from '@/lib/providers';
 
 export const metadata: Metadata = {
   title: 'v0 App',
@@ -17,11 +16,10 @@ export default function RootLayout({
   return (
     <html lang="pl">
       <body>
-
+        <Providers>
           {children}
-
+        </Providers>
       </body>
     </html>
   );
 }
-
