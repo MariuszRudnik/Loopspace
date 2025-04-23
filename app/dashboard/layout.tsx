@@ -3,9 +3,11 @@ import type { ReactNode } from "react"
 import DashboardSidebar from "@/components/dashboard-sidebar"
 import DashboardNavbar from "@/components/dashboard-navbar"
 import { AIChatBot } from "@/components/ai-chat-bot"
+import QueryProvider from "@/components/providers/QueryProvider";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
+      <QueryProvider>
     <div className="flex min-h-screen flex-col">
       <DashboardNavbar />
       <div className="flex flex-1">
@@ -14,5 +16,6 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       </div>
       <AIChatBot />
     </div>
+    </QueryProvider>
   )
 }
