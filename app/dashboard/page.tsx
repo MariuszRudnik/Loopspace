@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button"
 import { PlusCircle } from "lucide-react"
 import CourseCard from "@/components/course-card"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+const API_URL = process.env.NEXT_PUBLIC_API_URL
+
 
 export default function DashboardPage() {
   const [modalOpen, setModalOpen] = useState(false)
@@ -15,7 +17,7 @@ export default function DashboardPage() {
   const { data: channelsList } = useQuery<any[], Error, any[], ["channels"]>({
     queryKey: ["channels"],
     queryFn: async () => {
-      const res = await fetch("http://localhost:3000/api/channels/list")
+      const res = await fetch(`${API_URL}/api/channels/list`)
       if (!res.ok) {
         throw new Error("Błąd pobierania kanałów")
       }
@@ -25,7 +27,8 @@ export default function DashboardPage() {
 
   const addChannelMutation = useMutation({
     mutationFn: async ({ name, description }: { name: string, description: string }) => {
-      const res = await fetch("http://localhost:3000/api/channels/add", {
+
+      const res = await fetch(`${API_URL}/api/channels/add`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, description })
