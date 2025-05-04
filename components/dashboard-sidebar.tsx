@@ -68,7 +68,19 @@ export default function DashboardSidebar() {
       return res.json()
     },
   })
-  console.log(channelsList)
+
+  // Pobieranie kursów dla wszystkich kanałów
+  const { data: coursesList } = useQuery<any[], Error, any[], ["courses"]>({
+    queryKey: ["courses"],
+    queryFn: async () => {
+      const res = await fetch(`${API_URL}/api/courses`)
+      if (!res.ok) {
+        throw new Error("Błąd pobierania kursów")
+      }
+      const result = await res.json()
+      return result.data
+    },
+  })
 
   const isSpecificLessonPage = pathname?.match(/\/channels\/(\d+)\/lessons\/(\d+)/)
   const channelId = isSpecificLessonPage ? isSpecificLessonPage[1] : null
@@ -154,8 +166,18 @@ export default function DashboardSidebar() {
                       <span>{channel.name}</span>
                     </div>
                     <div className="ml-6 flex flex-col gap-1 border-l pl-2">
-                    {/*tu będzie lista lekcji*/}
-
+                      {/* Lista kursów dla danego kanału */}
+                      {coursesList
+                        ?.filter((course) => course.channel_id === channel.id)
+                        .map((course) => (
+                          <Link
+                            key={course.id}
+                            href={`/dashboard/courses/${course.id}`}
+                            className="rounded-md px-3 py-1 text-sm hover:bg-muted"
+                          >
+                            {course.title}
+                          </Link>
+                        ))}
                       <AddPageModal courseId={channel.id} />
                     </div>
                   </div>
@@ -184,4 +206,3 @@ export default function DashboardSidebar() {
     </div>
   )
 }
-
