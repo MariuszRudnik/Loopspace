@@ -99,12 +99,12 @@
 
 ### Lessons
 
-#### GET /api/chapters/:chapterId/lessons
+#### GET /api/chapters/lessons/chapterId
 - Query params: `page`, `limit`
 - Response: `{ data: Lesson[], meta: { total, page, limit } }`
 - Access: Public course or enrolled or owner
 
-#### POST /api/chapters/:chapterId/lessons
+#### POST /api/chapters/lessons/:chapterId
 - Body: `{ title, content?, order_number, is_published? }`
 - Response: `Lesson`
 - Access: Course owner or admin
