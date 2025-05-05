@@ -74,13 +74,6 @@ const initialChapters = [
   },
 ]
 
-// Przykładowe dane kursów do pobrania nazwy kursu
-const courses = [
-  { id: "1", name: "Wprowadzenie do programowania" },
-  { id: "2", name: "Zaawansowany JavaScript" },
-  { id: "3", name: "Podstawy UX/UI Design" },
-]
-
 export default function CourseLessonsPage({ params: serverParams }: { params: { courseId: string } }) {
   // Używamy hooka useParams zamiast bezpośredniego dostępu do params.courseId
   const params = useParams()
@@ -100,8 +93,7 @@ export default function CourseLessonsPage({ params: serverParams }: { params: { 
     }
   });
 
-  const course = courses.find((c) => c.id === courseId)
-  const courseName = course ? course.name : "Kurs"
+  const courseName = "Kurs "
 
   // Stan dla modali
   const [openChapterModal, setOpenChapterModal] = useState(false)
@@ -257,6 +249,7 @@ export default function CourseLessonsPage({ params: serverParams }: { params: { 
         chapterName={chapterName}
         setChapterName={setChapterName}
         onAddChapter={handleAddChapter}
+        courseId={courseId} // Dodanie courseId jako prop
       />
 
       <AddLessonModal

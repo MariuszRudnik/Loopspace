@@ -24,12 +24,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 
-// Przykładowe dane kursów
-const courses = [
-  { id: "1", name: "Wprowadzenie do programowania" },
-  { id: "2", name: "Zaawansowany JavaScript" },
-  { id: "3", name: "Podstawy UX/UI Design" },
-]
+
 
 // Przykładowe dane postów
 const samplePosts = [
@@ -299,8 +294,8 @@ export default function FeedPage() {
   const courseId = params.courseId
 
   // Znajdź kurs na podstawie ID z parametrów URL
-  const course = courses.find((c) => c.id === courseId)
-  const courseName = course ? course.name : "Kanał"
+  // const course = courses.find((c) => c.id === courseId)
+  const courseName =  "Kanał 0"
 
   const [postText, setPostText] = useState("")
 
