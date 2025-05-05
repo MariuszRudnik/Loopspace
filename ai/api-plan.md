@@ -69,7 +69,9 @@
 #### DELETE /api/courses/:id
 - Access: Course owner or admin
 
-### Chapters
+#### GET /api/chapters/:id
+- Response: `Chapter` with lessons
+- Access: Public course or enrolled or owner
 
 #### GET /api/chapters/:courseId
 - Query params: `page`, `limit`
@@ -87,12 +89,12 @@
 
 [//]: # (- Access: Public course or enrolled or owner)
 
-#### PUT /api/chapters/:id
+#### PUT /api/chapters/edit/:id
 - Body: `{ title?, description?, order_number?, is_published? }`
 - Response: `Chapter`
 - Access: Course owner or admin
 
-#### DELETE /api/chapters/:id
+#### DELETE /api/chapters/edit/:id
 - Access: Course owner or admin
 
 ### Lessons

@@ -55,17 +55,24 @@ export async function GET(
       );
     }
 
+    // Zmodyfikowane zapytanie - pobieramy również lekcje (lessons) dla każdego rozdziału
     const { data: chapters, count, error: chaptersError } = await supabase
         .from('chapters')
-        .select('*', { count: 'exact' })
+        .select('*, lessons(*)', { count: 'exact' })
         .eq('course_id', courseId)
         .order('order_number', { ascending: true })
         .range((page - 1) * limit, page * limit - 1);
 
     if (chaptersError) throw chaptersError;
 
+    // Zapewnij, że każdy rozdział ma tablicę lekcji (nawet pustą)
+    const chaptersWithLessons = chapters?.map(chapter => ({
+      ...chapter,
+      lessons: chapter.lessons || []
+    })) || [];
+
     return NextResponse.json({
-      data: chapters,
+      data: chaptersWithLessons,
       meta: {
         total: count ?? 0,
         page,
@@ -204,3 +211,4 @@ export async function POST(
     );
   }
 }
+
