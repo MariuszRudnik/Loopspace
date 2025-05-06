@@ -192,12 +192,23 @@ export async function POST(
         .maybeSingle();
 
       if (existingLesson) {
-        // Przesunięcie istniejących lekcji z takim samym lub wyższym numerem porządkowym
-        await supabase
+        // Przesunięcie istniejących lekcji - naprawione (usunięto supabase.raw)
+        const { data: lessonsToUpdate } = await supabase
           .from('lessons')
-          .update({ order_number: supabase.raw('order_number + 1') })
+          .select('id, order_number')
           .eq('chapter_id', chapterId)
-          .gte('order_number', order_number);
+          .gte('order_number', order_number)
+          .order('order_number', { ascending: false });
+
+        // Aktualizacja każdej lekcji oddzielnie
+        if (lessonsToUpdate && lessonsToUpdate.length > 0) {
+          for (const lesson of lessonsToUpdate) {
+            await supabase
+              .from('lessons')
+              .update({ order_number: lesson.order_number + 1 })
+              .eq('id', lesson.id);
+          }
+        }
       }
     }
 
@@ -249,3 +260,4 @@ export async function POST(
     );
   }
 }
+

@@ -112,6 +112,9 @@ export default function CourseLessonsPage({ params: serverParams }: { params: { 
     lessonIndex: number
   } | null>(null)
 
+  // Dodajemy stan dla przechowywania ID bieżącego rozdziału
+  const [currentChapterId, setCurrentChapterId] = useState<string | null>(null)
+
   // Stan dla rozdziałów - używamy danych z API jeśli są dostępne, w przeciwnym razie korzystamy z danych mockowych
   const [chapters, setChapters] = useState(initialChapters)
 
@@ -154,6 +157,11 @@ export default function CourseLessonsPage({ params: serverParams }: { params: { 
 
   const openAddLessonModal = (chapterIndex: number) => {
     setCurrentChapterIndex(chapterIndex)
+    // Pobieramy ID rozdziału i logujemy je w konsoli
+    const chapterId = chapters[chapterIndex].id
+    setCurrentChapterId(chapterId)
+    console.log("ID rozdziału:", chapterId)
+    
     setLessonName("")
     setLessonContent("")
     setOpenLessonModal(true)
@@ -260,6 +268,7 @@ export default function CourseLessonsPage({ params: serverParams }: { params: { 
         lessonContent={lessonContent}
         setLessonContent={setLessonContent}
         currentChapterTitle={currentChapterIndex !== null ? chapters[currentChapterIndex]?.title : ""}
+        currentChapterId={currentChapterId} // Przekazujemy ID rozdziału do komponentu
         onAddLesson={handleAddLesson}
       />
 
@@ -271,6 +280,11 @@ export default function CourseLessonsPage({ params: serverParams }: { params: { 
         editedLessonContent={editedLessonContent}
         setEditedLessonContent={setEditedLessonContent}
         chapterTitle={editingLessonInfo ? chapters[editingLessonInfo.chapterIndex]?.title : ""}
+        lessonId={
+          editingLessonInfo
+            ? chapters[editingLessonInfo.chapterIndex]?.lessons[editingLessonInfo.lessonIndex]?.id
+            : null
+        }
         onSaveLesson={handleSaveEditedLesson}
       />
 

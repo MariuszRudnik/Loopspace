@@ -5,6 +5,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { z } from "zod"
+import { useState } from "react"
+
+const lessonSchema = z.object({
+  title: z.string().min(3, "Nazwa lekcji musi mieć co najmniej 3 znaki"),
+  content: z.string().min(1, "Zawartość lekcji nie może być pusta"),
+})
 
 interface AddLessonModalProps {
   open: boolean
@@ -14,7 +22,8 @@ interface AddLessonModalProps {
   lessonContent: string
   setLessonContent: (content: string) => void
   currentChapterTitle: string
-  onAddLesson: () => void
+  currentChapterId: string | null
+  onAddLesson: () => void // nieużywane, zostaje dla kompatybilności
 }
 
 export default function AddLessonModal({
@@ -25,8 +34,47 @@ export default function AddLessonModal({
   lessonContent,
   setLessonContent,
   currentChapterTitle,
-  onAddLesson,
+  currentChapterId,
 }: AddLessonModalProps) {
+  const queryClient = useQueryClient()
+  const [error, setError] = useState<string | null>(null)
+  const mutation = useMutation({
+    mutationFn: async ({ title, content }: { title: string; content: string }) => {
+      if (!currentChapterId) throw new Error("Brak ID rozdziału")
+      const res = await fetch(`/api/chapters/lessons/${currentChapterId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, content }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data?.error?.message || "Błąd podczas dodawania lekcji")
+      }
+      return res.json()
+    },
+    onSuccess: () => {
+      setOpen(false)
+      setLessonName("")
+      setLessonContent("")
+      setError(null)
+      // Odśwież listę rozdziałów (chapters)
+      queryClient.invalidateQueries({ queryKey: ["chapters"] })
+    },
+    onError: (err: any) => {
+      setError(err.message || "Błąd podczas dodawania lekcji")
+    },
+  })
+
+  const handleSave = () => {
+    setError(null)
+    const validation = lessonSchema.safeParse({ title: lessonName, content: lessonContent })
+    if (!validation.success) {
+      setError(validation.error.errors[0].message)
+      return
+    }
+    mutation.mutate({ title: lessonName, content: lessonContent })
+  }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
@@ -36,6 +84,7 @@ export default function AddLessonModal({
             {currentChapterTitle && (
               <span className="font-normal text-muted-foreground text-sm block mt-1">
                 do rozdziału: {currentChapterTitle}
+                {currentChapterId && <span className="text-xs"> (ID: {currentChapterId})</span>}
               </span>
             )}
           </DialogTitle>
@@ -73,14 +122,15 @@ export default function AddLessonModal({
                 dangerouslySetInnerHTML={{ __html: lessonContent }}
               />
             </div>
+            {error && <div className="text-red-500 text-sm">{error}</div>}
           </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>
             Anuluj
           </Button>
-          <Button onClick={onAddLesson} disabled={!lessonName.trim()}>
-            Zapisz
+          <Button onClick={handleSave} disabled={!lessonName.trim() || mutation.isPending}>
+            {mutation.isPending ? "Zapisywanie..." : "Zapisz"}
           </Button>
         </DialogFooter>
       </DialogContent>
