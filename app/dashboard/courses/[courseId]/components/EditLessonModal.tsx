@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
+import { z } from "zod"
 
 interface EditLessonModalProps {
   open: boolean
@@ -19,6 +20,11 @@ interface EditLessonModalProps {
   lessonId?: string | null
   onSaveLesson: () => void
 }
+
+const lessonSchema = z.object({
+  title: z.string().min(3, "Nazwa lekcji musi mieć co najmniej 3 znaki"),
+  content: z.string().min(1, "Zawartość lekcji nie może być pusta"),
+})
 
 export default function EditLessonModal({
   open,
@@ -33,6 +39,31 @@ export default function EditLessonModal({
 }: EditLessonModalProps) {
   const queryClient = useQueryClient()
   const [error, setError] = useState<string | null>(null)
+
+  // PUT: aktualizacja lekcji
+  const updateMutation = useMutation({
+    mutationFn: async ({ title, content }: { title: string; content: string }) => {
+      if (!lessonId) throw new Error("Brak ID lekcji")
+      const res = await fetch(`/api/lessons/${lessonId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, content }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data?.error?.message || "Błąd podczas aktualizacji lekcji")
+      }
+      return res.json()
+    },
+    onSuccess: () => {
+      setOpen(false)
+      setError(null)
+      queryClient.invalidateQueries({ queryKey: ["chapters"] })
+    },
+    onError: (err: any) => {
+      setError(err.message || "Błąd podczas aktualizacji lekcji")
+    },
+  })
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
@@ -49,7 +80,6 @@ export default function EditLessonModal({
     onSuccess: () => {
       setOpen(false)
       setError(null)
-      // Odśwież listę rozdziałów (chapters)
       queryClient.invalidateQueries({ queryKey: ["chapters"] })
     },
     onError: (err: any) => {
@@ -64,6 +94,16 @@ export default function EditLessonModal({
       return
     }
     deleteMutation.mutate()
+  }
+
+  const handleSave = () => {
+    setError(null)
+    const validation = lessonSchema.safeParse({ title: editedLessonName, content: editedLessonContent })
+    if (!validation.success) {
+      setError(validation.error.errors[0].message)
+      return
+    }
+    updateMutation.mutate({ title: editedLessonName, content: editedLessonContent })
   }
 
   return (
@@ -132,8 +172,12 @@ export default function EditLessonModal({
             <Button variant="outline" onClick={() => setOpen(false)} className="flex-1">
               Anuluj
             </Button>
-            <Button onClick={onSaveLesson} className="flex-1" disabled={!editedLessonName.trim()}>
-              Zapisz zmiany
+            <Button
+              onClick={handleSave}
+              className="flex-1"
+              disabled={!editedLessonName.trim() || updateMutation.isPending}
+            >
+              {updateMutation.isPending ? "Zapisywanie..." : "Zapisz zmiany"}
             </Button>
           </div>
         </DialogFooter>
@@ -141,4 +185,3 @@ export default function EditLessonModal({
     </Dialog>
   )
 }
-
