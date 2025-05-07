@@ -1,9 +1,9 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
-import { Bot, Send, X } from "lucide-react"
+import { useMutation } from "@tanstack/react-query"
+import { Bot, Send, X, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -33,11 +33,32 @@ export function AIChatBot() {
     setIsOpen(!isOpen)
   }
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  // Mutacja do wysyłania wiadomości do API
+  const chatMutation = useMutation({
+    mutationFn: async (messages: { role: "user" | "assistant"; content: string }[]) => {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: messages.map(m => ({
+            role: m.role,
+            content: m.content,
+          })),
+        }),
+      })
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error?.error?.message || "Błąd AI")
+      }
+      const data = await res.json()
+      // Odpowiedź AI może być w różnych formatach, zależnie od modelu
+      return data?.message?.content || data?.choices?.[0]?.message?.content || "Brak odpowiedzi AI"
+    },
+  })
+
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
-
     if (!input.trim()) return
-
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -49,16 +70,28 @@ export function AIChatBot() {
     setMessages((prev) => [...prev, userMessage])
     setInput("")
 
-    // Symulacja odpowiedzi AI (w przyszłości będzie to faktyczne połączenie z AI)
-    setTimeout(() => {
+    // Wyślij wiadomości do API i dodaj odpowiedź AI
+    try {
+      const aiContent = await chatMutation.mutateAsync([
+        ...messages,
+        { role: "user", content: input },
+      ])
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: "To tylko przykładowa odpowiedź. W przyszłości będę mógł pomóc ci z twoimi projektami!",
+        content: aiContent,
         role: "assistant",
         timestamp: new Date(),
       }
       setMessages((prev) => [...prev, aiMessage])
-    }, 1000)
+    } catch (err: any) {
+      const aiMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: err.message || "Wystąpił błąd podczas komunikacji z AI.",
+        role: "assistant",
+        timestamp: new Date(),
+      }
+      setMessages((prev) => [...prev, aiMessage])
+    }
   }
 
   return (
@@ -107,6 +140,21 @@ export function AIChatBot() {
                     </div>
                   </div>
                 ))}
+                {/* Spinner ładowania odpowiedzi AI */}
+                {chatMutation.isPending && (
+                  <div className="flex justify-start">
+                    <div className="flex gap-2 max-w-[80%] flex-row">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src="/futuristic-helper-bot.png" />
+                        <AvatarFallback>AI</AvatarFallback>
+                      </Avatar>
+                      <div className="rounded-lg p-3 text-sm bg-muted flex items-center">
+                        <Loader2 className="animate-spin h-5 w-5 text-muted-foreground" />
+                        <span className="ml-2 text-muted-foreground">AI myśli...</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </CardContent>
           </ScrollArea>
@@ -117,8 +165,9 @@ export function AIChatBot() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 className="flex-1"
+                disabled={chatMutation.isPending}
               />
-              <Button type="submit" size="icon" disabled={!input.trim()}>
+              <Button type="submit" size="icon" disabled={!input.trim() || chatMutation.isPending}>
                 <Send className="h-4 w-4" />
                 <span className="sr-only">Wyślij</span>
               </Button>
@@ -129,3 +178,4 @@ export function AIChatBot() {
     </>
   )
 }
+
