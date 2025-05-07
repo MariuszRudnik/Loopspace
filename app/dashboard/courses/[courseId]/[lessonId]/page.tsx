@@ -1,9 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, CheckCircle, Circle } from "lucide-react"
 import Link from "next/link"
+import { useParams } from "next/navigation"
+import { useQuery } from "@tanstack/react-query"
 
 // Przykładowe dane rozdziałów/lekcji
 const chapters = [
@@ -197,6 +199,30 @@ function findAdjacentLessons(currentLessonId: string) {
 }
 
 export default function LessonPage({ params }: { params: { courseId: string; lessonId: string } }) {
+  const urlParams = useParams()
+  const courseId = urlParams.courseId as string
+  const [hasAccess, setHasAccess] = useState<boolean | null>(null)
+  
+  // Pobierz listę kursów
+  const { data: coursesData, isLoading } = useQuery<{data: any[]}>({
+    queryKey: ["courses"],
+    queryFn: async () => {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/courses`)
+      if (!res.ok) {
+        throw new Error("Błąd pobierania kursów")
+      }
+      return res.json()
+    }
+  })
+
+  // Sprawdź czy użytkownik ma dostęp do kursu
+  useEffect(() => {
+    if (coursesData?.data) {
+      const courseExists = coursesData.data.some(course => course.id === courseId)
+      setHasAccess(courseExists)
+    }
+  }, [coursesData, courseId])
+
   // Znajdź kurs i lekcję na podstawie ID z parametrów URL
   const course = courses.find((c) => c.id === params.courseId)
   const lessonData = lessonsData.find((l) => l.id === params.lessonId)
@@ -212,6 +238,26 @@ export default function LessonPage({ params }: { params: { courseId: string; les
     setIsCompleted(!isCompleted)
     // W rzeczywistej aplikacji tutaj byłoby wywołanie API do zapisania stanu
     console.log(`Lekcja ${params.lessonId} oznaczona jako ${!isCompleted ? "ukończona" : "nieukończona"}`)
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex h-[70vh] flex-col items-center justify-center">
+        <h1 className="text-2xl font-bold">Ładowanie...</h1>
+      </div>
+    )
+  }
+
+  if (hasAccess === false) {
+    return (
+      <div className="flex h-[70vh] flex-col items-center justify-center">
+        <h1 className="text-2xl font-bold">Brak uprawnień</h1>
+        <p className="mt-2 text-muted-foreground">Nie masz dostępu do tego kursu.</p>
+        <Link href="/dashboard" className="mt-4">
+          <Button>Powrót do dashboardu</Button>
+        </Link>
+      </div>
+    )
   }
 
   if (!lessonData) {

@@ -1,0 +1,23 @@
+# środowisko
+.env
+.env.local
+
+# node
+node_modules/
+
+# IDE
+.idea/
+*.iml
+
+# build
+.next/
+dist/
+out/
+
+# systemowe
+.DS_Store
+
+# inne
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

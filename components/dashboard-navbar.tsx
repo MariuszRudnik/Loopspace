@@ -15,10 +15,12 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { SidebarTrigger } from "@/components/sidebar-trigger"
 import { useSidebarStore } from "@/lib/store"
+import {useMutation} from "@tanstack/react-query";
+import {useRouter} from "next/navigation";
 
 export default function DashboardNavbar() {
+  const router = useRouter()
   const setIsMobile = useSidebarStore((state) => state.setIsMobile)
-
   useEffect(() => {
     const checkIfMobile = () => {
       setIsMobile(window.innerWidth < 768)
@@ -35,6 +37,32 @@ export default function DashboardNavbar() {
       window.removeEventListener("resize", checkIfMobile)
     }
   }, [setIsMobile])
+
+  const { mutate: logout, isPending } = useMutation({
+    mutationFn: async () => {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // Ważne dla ciasteczek
+      })
+
+      if (!response.ok) {
+        throw new Error("Błąd podczas wylogowywania")
+      }
+
+      return response.json()
+    },
+    onSuccess: () => {
+      // Po udanym wylogowaniu przekieruj na stronę główną/logowania
+      router.push("/login")
+    },
+    onError: (error) => {
+      console.error("Błąd wylogowania:", error)
+      // Tutaj możesz dodać wyświetlenie powiadomienia o błędzie
+    }
+  })
 
   return (
     <header className="sticky top-0 z-30 flex h-16 w-full items-center border-b bg-background px-4 md:px-6">
@@ -69,9 +97,9 @@ export default function DashboardNavbar() {
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <Link href="/" className="flex w-full">
+              <button className="flex w-full" onClick={()=> logout()}>
                 Wyloguj się
-              </Link>
+              </button>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
