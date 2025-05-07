@@ -19,7 +19,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Stały base URL z pełną ścieżką API
+
     const baseUrl = "https://openrouter.ai/api/v1";
     const defaultModel = process.env.OPENROUTER_DEFAULT_MODEL || "deepseek/deepseek-r1:free";
 
