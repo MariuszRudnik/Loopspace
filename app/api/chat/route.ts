@@ -1,6 +1,17 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
 export async function POST(request: Request) {
+  const cookieStore = await cookies();
+  const authToken = cookieStore.get('supabase-auth-token')?.value;
+
+  if (!authToken) {
+    return NextResponse.json(
+      { error: { code: 'UNAUTHORIZED', message: 'Użytkownik niezalogowany' } },
+      { status: 401 }
+    );
+  }
+
   try {
     const body = await request.json();
 
@@ -81,3 +92,4 @@ export async function GET() {
       { status: 200 }
   );
 }
+
