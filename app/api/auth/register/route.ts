@@ -22,15 +22,23 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const profileInsert = await supabase
+    const { data: existingProfile } = await supabase
       .from('profiles')
-      .insert({ id: data.user?.id, email, display_name: displayName });
+      .select('id')
+      .eq('id', data.user?.id)
+      .single();
 
-    if (profileInsert.error) {
-      return NextResponse.json(
-        { error: { code: 'PROFILE_INSERT_FAILED', message: profileInsert.error.message } },
-        { status: 400 }
-      );
+    if (!existingProfile) {
+      const profileInsert = await supabase
+        .from('profiles')
+        .insert({ id: data.user?.id, email, display_name: displayName });
+
+      if (profileInsert.error) {
+        return NextResponse.json(
+          { error: { code: 'PROFILE_INSERT_FAILED', message: profileInsert.error.message } },
+          { status: 400 }
+        );
+      }
     }
 
     return NextResponse.json(
@@ -44,3 +52,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+

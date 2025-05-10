@@ -132,6 +132,11 @@ export default function LoginPage() {
                 <Button type="submit" className="w-full" disabled={isPending}>
                   {isPending ? "Logowanie..." : "Zaloguj się"}
                 </Button>
+                <div className="text-center mt-2">
+                  <Link href="/register" className="text-sm text-blue-600 underline">
+                    Nie masz konta? Zarejestruj się
+                  </Link>
+                </div>
               </div>
             </form>
           </CardContent>

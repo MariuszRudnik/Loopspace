@@ -30,48 +30,7 @@ const initialChapters = [
       },
     ],
   },
-  {
-    id: "2",
-    title: "Podstawy teoretyczne",
-    lessons: [
-      {
-        id: "3",
-        title: "Kluczowe pojęcia",
-        content:
-          "<h2>Kluczowe pojęcia</h2><p>W tej lekcji poznasz najważniejsze pojęcia, które będą używane w trakcie całego kursu.</p>",
-      },
-      {
-        id: "4",
-        title: "Historia i rozwój dziedziny",
-        content:
-          "<h2>Historia i rozwój dziedziny</h2><p>W tej lekcji poznasz historię i rozwój dziedziny, której dotyczy kurs.</p>",
-      },
-    ],
-  },
-  {
-    id: "3",
-    title: "Praktyczne zastosowania",
-    lessons: [
-      {
-        id: "5",
-        title: "Studium przypadku #1",
-        content:
-          "<h2>Studium przypadku #1</h2><p>W tej lekcji przeanalizujemy pierwszy przypadek praktyczny, który pomoże Ci zrozumieć zastosowanie teorii w praktyce.</p>",
-      },
-      {
-        id: "6",
-        title: "Ćwiczenia praktyczne",
-        content:
-          "<h2>Ćwiczenia praktyczne</h2><p>W tej lekcji wykonasz serię ćwiczeń praktycznych, które pomogą Ci utrwalić zdobytą wiedz��.</p>",
-      },
-      {
-        id: "7",
-        title: "Projekt grupowy",
-        content:
-          "<h2>Projekt grupowy</h2><p>W tej lekcji dowiesz się, jak będzie wyglądał projekt grupowy, który będzie zwieńczeniem kursu.</p>",
-      },
-    ],
-  },
+
 ]
 
 export default function CourseLessonsPage({ params: serverParams }: { params: { courseId: string } }) {
