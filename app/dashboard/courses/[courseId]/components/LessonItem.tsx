@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { ChevronDown, ChevronUp } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 interface LessonItemProps {
   lesson: {
@@ -29,6 +30,14 @@ export default function LessonItem({
   onMoveUp,
   onMoveDown,
 }: LessonItemProps) {
+  const router = useRouter();
+
+  const handlePreview = () => {
+    console.log("Podgląd lekcji, id:", lesson.id);
+    // Poprawny adres do podglądu lekcji: /dashboard/courses/[courseId]/lessons/[lessonId]
+    router.push(`/dashboard/courses/${courseId}/lessons/${lesson.id}`);
+  };
+
   return (
     <div
       className={`flex items-center justify-between p-4 ${
@@ -71,12 +80,15 @@ export default function LessonItem({
         >
           Edytuj
         </Button>
-        <Link href={`/dashboard/courses/${courseId}/lessons/${lesson.id}`}>
-          <Button variant="ghost" size="sm">
-            Podgląd
-          </Button>
-        </Link>
+        {/*<Button*/}
+        {/*  variant="ghost"*/}
+        {/*  size="sm"*/}
+        {/*  onClick={handlePreview}*/}
+        {/*>*/}
+        {/*  Podgląd*/}
+        {/*</Button>*/}
       </div>
     </div>
   )
 }
+
