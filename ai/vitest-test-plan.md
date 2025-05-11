@@ -18,6 +18,77 @@
 - Test czyszczenia cookies sesji
 - Test wylogowania niezalogowanego użytkownika
 
+```typescript
+import { describe, it, expect, beforeAll, beforeEach } from 'vitest';
+import request from 'supertest';
+import { app } from '../path-to-your-server';
+
+describe('/api/auth/logout endpoint tests', () => {
+  const baseEndpoint = '/api/auth/logout';
+  let authCookie: string;
+
+  beforeAll(async () => {
+    // Login first to get authentication cookie
+    const loginResponse = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'testuser@example.com', password: 'password123' });
+    
+    // Extract the authentication cookie
+    authCookie = loginResponse.headers['set-cookie'][0];
+  });
+
+  beforeEach(() => {
+    // Reset any mocks between tests
+    vi.clearAllMocks();
+  });
+
+  it('should successfully log out an authenticated user', async () => {
+    const response = await request(app)
+      .post(baseEndpoint)
+      .set('Cookie', authCookie);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        success: true,
+        message: expect.stringContaining('logged out')
+      })
+    );
+  });
+
+  it('should clear session cookies after logout', async () => {
+    const response = await request(app)
+      .post(baseEndpoint)
+      .set('Cookie', authCookie);
+
+    // Check that cookies are cleared (set to empty or with expiry in the past)
+    expect(response.headers['set-cookie']).toBeDefined();
+    const logoutCookie = response.headers['set-cookie'][0];
+    expect(logoutCookie).toMatch(/Max-Age=0|Expires=/);
+
+    // Try to access a protected endpoint after logout
+    const protectedResponse = await request(app)
+      .get('/api/channels/list')
+      .set('Cookie', logoutCookie);
+
+    expect(protectedResponse.status).toBe(401);
+  });
+
+  it('should handle logout for unauthenticated users gracefully', async () => {
+    const response = await request(app)
+      .post(baseEndpoint);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        success: true,
+        message: expect.any(String)
+      })
+    );
+  });
+});
+```
+
 #### `/api/auth/register`
 - Test poprawnej rejestracji użytkownika
 - Test rejestracji z istniejącym emailem
@@ -201,3 +272,94 @@ describe('API tests', () => {
   // Testy endpointów...
 });
 ```
+import { describe, it, expect } from 'vitest';
+import request from 'supertest'; // Assuming you're using a library like supertest to test HTTP endpoints
+import { app } from '../path-to-your-server'; // Import your app/server
+
+describe('/api/channels/list endpoint tests', () => {
+  const baseEndpoint = '/api/channels/list';
+
+  describe('Authenticated User', () => {
+    let token: string;
+
+    beforeAll(async () => {
+      // Mock authentication - Obtain a valid token
+      const authResponse = await request(app)
+        .post('/api/auth/login')
+        .send({ email: 'testuser@example.com', password: 'password123' });
+      token = authResponse.body.token;
+    });
+
+    it('should fetch the list of channels for authenticated user', async () => {
+      const response = await request(app)
+        .get(baseEndpoint)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: expect.any(String),
+            name: expect.any(String),
+            description: expect.any(String),
+          }),
+        ])
+      );
+    });
+
+    it('should filter channels based on query parameters', async () => {
+      const response = await request(app)
+        .get(`${baseEndpoint}?filter=name:example`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(200);
+      // Check if returned data is filtered correctly
+      response.body.forEach((channel: any) => {
+        expect(channel.name).toContain('example');
+      });
+    });
+
+    it('should paginate channels correctly', async () => {
+      const response = await request(app)
+        .get(`${baseEndpoint}?page=1&limit=5`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.meta).toEqual(
+        expect.objectContaining({
+          page: 1,
+          limit: 5,
+        })
+      );
+    });
+
+    it('should sort channels correctly', async () => {
+      // Assuming sorting can be done by name in ascending order
+      const response = await request(app)
+        .get(`${baseEndpoint}?sort=name.asc`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(200);
+      const sorted = [...response.body.data].sort((a: any, b: any) =>
+        a.name.localeCompare(b.name)
+      );
+      expect(response.body.data).toEqual(sorted);
+    });
+  });
+
+  describe('Unauthenticated User', () => {
+    it('should return 401 for unauthenticated user', async () => {
+      const response = await request(app).get(baseEndpoint);
+
+      expect(response.status).toBe(401);
+      expect(response.body).toEqual(
+        expect.objectContaining({
+          error: expect.objectContaining({
+            code: 'UNAUTHORIZED',
+            message: 'Missing or invalid authentication token',
+          }),
+        })
+      );
+    });
+  });
+});
