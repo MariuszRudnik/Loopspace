@@ -67,10 +67,7 @@ export default function DashboardPage() {
           <p className="mt-2 text-muted-foreground">
             Rozpocznij swoją przygodę edukacyjną dodając swój pierwszy kanał.
           </p>
-          <Button className="mt-6">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Dodaj pierwszy kanał
-          </Button>
+
         </div>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
