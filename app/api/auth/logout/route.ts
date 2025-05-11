@@ -1,60 +1,53 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { supabase } from '@/lib/supabaseClient';
+import { cookies } from 'next/headers';
 
-// Nagłówki CORS - pozwalają na dostęp z innych domen
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  'Content-Type': 'application/json',
-};
-
-// Obsługa zapytań preflight CORS
-export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 204,
-    headers: corsHeaders,
-  });
-}
-
-// Główna funkcja obsługująca wylogowanie użytkownika
-export async function POST(req: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
-    const response = NextResponse.json(
-      { message: 'Wylogowano pomyślnie', success: true },
-      { status: 200, headers: corsHeaders }
-    );
+    const cookieStore = await cookies();
+    const authToken = cookieStore.get('supabase-auth-token')?.value;
 
-    // Lista wszystkich ciasteczek związanych z autoryzacją Supabase
-    const authCookies = [
-      'sb-access-token',
-      'sb-refresh-token',
-      'sb:token',
-      'supabase-auth-token',
-      'supabase-auth-refresh-token',
-      '__session',
-      'sb-provider-token'
-    ];
+    // Nawet jeśli tokenu nie ma, próbujemy wylogować dla pewności
+    // i wyczyścić potencjalne pozostałości ciasteczek.
+    const { error } = await supabase.auth.signOut();
 
-    // Usunięcie wszystkich ciasteczek autoryzacyjnych
-    authCookies.forEach(cookieName => {
-      // Ustawienie daty wygaśnięcia w przeszłości powoduje usunięcie ciasteczka
-      response.cookies.set({
-        name: cookieName,
-        value: '',
-        expires: new Date(0),
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-        httpOnly: true,
-        sameSite: 'lax'
-      });
-    });
+    // Definiujemy typ odpowiedzi z opcjonalnym warning
+    interface ResponseData {
+      message: string;
+      warning?: string;
+    }
+    
+    // Usuwanie ciasteczek
+    const responseData: ResponseData = { message: 'Wylogowanie zakończone sukcesem' };
+    
+    if (error) {
+      console.warn('Błąd podczas wylogowywania z Supabase:', error.message);
+      // Teraz możemy bezpiecznie dodać warning
+      responseData.warning = 'Wystąpił błąd podczas wylogowywania z Supabase';
+    }
+    
+    const response = NextResponse.json(responseData, { status: 200 });
+
+    response.cookies.delete('supabase-auth-token');
+    response.cookies.delete('supabase-auth-refresh-token');
+    response.cookies.delete('authenticated');
+    
+    // Dodatkowe czyszczenie po stronie next/headers, jeśli jest używane
+    cookieStore.delete('supabase-auth-token');
+    cookieStore.delete('supabase-auth-refresh-token');
+    cookieStore.delete('authenticated');
 
     return response;
-  } catch (error) {
-    console.error('Błąd podczas wylogowywania:', error);
-    return NextResponse.json(
-      { message: 'Wystąpił błąd podczas wylogowywania', success: false },
-      { status: 500, headers: corsHeaders }
+  } catch (err) {
+    console.error('Nieoczekiwany błąd podczas wylogowywania:', err);
+    const response = NextResponse.json(
+      { error: { code: 'LOGOUT_FAILED', message: 'Wystąpił nieoczekiwany błąd podczas wylogowywania' } },
+      { status: 500 }
     );
+    response.cookies.delete('supabase-auth-token');
+    response.cookies.delete('supabase-auth-refresh-token');
+    response.cookies.delete('authenticated');
+    return response;
   }
 }
+
