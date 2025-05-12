@@ -1,4 +1,3 @@
-
 # Loopspace
 
 ## Table of Contents
@@ -14,7 +13,8 @@
 
 ## Project Description
 
-Loopspace is an open-source platform designed for knowledge sharing, video courses, and community building. It aims to provide a free, self-hosted alternative to commercial platforms like Circle.so, eliminating subscription costs for small businesses, educators, and independent creators.
+Loopspace is an open-source platform for knowledge sharing and community building.  
+**The MVP version includes only a simple chatbot for conversation, administrator registration, and the ability to add channels, courses, and individual lessons. Supabase is used as the main database. Other features described in this document will be added in the future. Test coverage is not complete yet, but will be improved.**
 
 ---
 
@@ -75,29 +75,34 @@ The following scripts are available in the project:
 ## Project Scope
 
 ### MVP Features
-- **User Management:**
-  - Add users and assign passwords manually.
-  - Password reset functionality.
-- **Educational Materials:**
-  - Upload video files (MP4) from a local server.
-  - Add articles and external resource links.
-- **Comments:**
-  - Users can comment on educational materials.
+- **Chatbot:**
+  - Simple AI chatbot for conversation.
+- **Administrator registration:**
+  - Ability to register an administrator account.
+- **Channels, Courses, Lessons:**
+  - Add thematic channels.
+  - Create courses within channels.
+  - Add individual lessons to courses.
+- **Database:**
+  - Supabase as the main backend and database.
 
 ### Excluded from MVP
 - User activity history.
-- AI-powered chatbot for learning support.
+- Advanced AI chatbot for learning support and quiz generation.
 - Bookmarks and personal notes.
 - Advanced customization options.
+- Comments under materials.
+- Video player and video uploads.
+- User management and password reset.
+- Full test coverage (tests will be improved in the future).
 
 ---
 
 ## Project Status
 
-The project is currently in the **MVP development phase**. The roadmap includes:
-1. **Phase 1:** Implementing core MVP features.
-2. **Phase 2:** Functional and usability testing.
-3. **Phase 3:** Publishing the project as open-source on GitHub.
+The project is currently in the **MVP development phase**.  
+Only the chatbot and basic content structure are implemented.  
+Other features and full test coverage will be added in the future.
 
 ---
 
@@ -105,3 +110,4 @@ The project is currently in the **MVP development phase**. The roadmap includes:
 
 This project is open-source. The specific license will be added soon.
 
+``
