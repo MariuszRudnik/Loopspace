@@ -6,6 +6,8 @@
 
 Aplikacja **Loopspace** to platforma open-source umożliwiająca tworzenie przestrzeni do dzielenia się wiedzą, prowadzenia kursów wideo oraz organizowania społeczności. Głównym celem jest dostarczenie darmowego rozwiązania, które można zainstalować na własnym serwerze, eliminując koszty subskrypcji związane z komercyjnymi platformami, takimi jak Circle.so.
 
+**Wersja MVP zawiera jedynie prostego chatbota do rozmowy, możliwość rejestracji administratora oraz możliwość dodawania kanałów, kursów i poszczególnych lekcji. Pozostałe funkcje opisane w tym dokumencie będą rozwijane w przyszłości.**
+
 ---
 
 ## Główny problem
@@ -26,24 +28,30 @@ Obecne platformy, takie jak Circle.so, są kosztowne i wymagają comiesięcznych
 
 ### Funkcjonalności MVP
 
-1. **Zarządzanie użytkownikami:**
-   - Administrator może dodawać użytkowników i ręcznie nadawać im hasła.
-   - Użytkownicy mogą resetować swoje hasła za pomocą dedykowanej strony.
+1. **Chatbot do rozmowy:**
+   - Prosty chatbot AI wspierający użytkownika w rozmowie.
 
-2. **Tworzenie kursów i materiałów edukacyjnych:**
-   - Możliwość dodawania materiałów wideo (format MP4) z własnego serwera.
-   - Możliwość dodawania artykułów i linków do zewnętrznych zasobów.
-   - Funkcje odtwarzania wideo: zatrzymywanie, cofanie, wznawianie oraz zapisywanie czasu odtwarzania.
+2. **Rejestracja administratora:**
+   - Możliwość rejestracji konta administratora.
 
-3. **Komentarze:**
-   - Użytkownicy mogą komentować materiały edukacyjne w ramach społeczności.
+3. **Kanały, kursy i lekcje:**
+   - Możliwość dodawania kanałów tematycznych.
+   - Możliwość tworzenia kursów w ramach kanałów.
+   - Możliwość dodawania poszczególnych lekcji do kursów.
+
+4. **Baza danych:**
+   - Supabase jako główna baza danych i backend.
 
 ### Funkcjonalności wykluczone z MVP
 
 - Historia aktywności użytkownika.
-- Chatbot wspierający naukę.
+- Zaawansowany chatbot wspierający naukę i generowanie quizów.
 - Tworzenie zakładek i notatek w materiałach.
 - Zaawansowane opcje personalizacji platformy.
+- Komentarze pod materiałami.
+- Odtwarzacz wideo z zaawansowanymi funkcjami.
+- Resetowanie haseł i zarządzanie użytkownikami przez administratora.
+- Testy pokrywające 100% funkcjonalności (testy będą rozwijane w przyszłości).
 
 ---
 
@@ -58,57 +66,49 @@ Obecne platformy, takie jak Circle.so, są kosztowne i wymagają comiesięcznych
 ## Ograniczenia projektowe
 
 - **Technologie:** React, Next.js, TypeScript.
-- **Baza danych:** Do ustalenia (np. PostgreSQL, MongoDB).
+- **Baza danych:** Supabase.
 - **Hosting:** Aplikacja musi działać na serwerach z systemem Linux.
-- **Wideo:** Obsługa plików MP4 z własnego serwera, bez zaawansowanych funkcji transkodowania.
+- **Wideo:** Obsługa plików MP4 i odtwarzacz wideo będą dodane w przyszłości.
 
 ---
 
 ## Historie użytkownika
 
 1. **Administrator:**
-   - Dodaje użytkowników i przypisuje im hasła.
-   - Tworzy kursy i dodaje materiały edukacyjne (wideo, artykuły, linki).
+   - Może się zarejestrować.
+   - Może tworzyć kanały, kursy i lekcje.
 
 2. **Użytkownik:**
-   - Loguje się do aplikacji i przegląda dostępne kursy.
-   - Odtwarza materiały wideo z możliwością zatrzymywania, cofania i zapisywania czasu.
-   - Komentuje materiały edukacyjne.
-   - Resetuje hasło za pomocą dedykowanej strony.
+   - Może rozmawiać z chatbotem.
+   - Może przeglądać dostępne kanały, kursy i lekcje.
 
 ---
 
 ## Wymagania funkcjonalne
 
-1. **Zarządzanie użytkownikami:**
-   - Formularz dodawania użytkowników przez administratora.
-   - Strona resetowania hasła dla użytkowników.
+1. **Chatbot:**
+   - Prosty interfejs do rozmowy z AI.
 
-2. **Materiały edukacyjne:**
-   - Obsługa przesyłania plików wideo (MP4) na serwer.
-   - Interfejs do dodawania artykułów i linków.
-
-3. **Komentarze:**
-   - Sekcja komentarzy pod każdym materiałem edukacyjnym.
-
-4. **Odtwarzacz wideo:**
-   - Funkcje: odtwarzanie, zatrzymywanie, cofanie, wznawianie, zapisywanie czasu.
+2. **Kanały, kursy i lekcje:**
+   - Możliwość tworzenia i przeglądania kanałów, kursów i lekcji.
 
 ---
 
 ## Wymagania niefunkcjonalne
 
 - **Wydajność:** Aplikacja powinna obsługiwać do 100 jednoczesnych użytkowników w MVP.
-- **Bezpieczeństwo:** Hasła użytkowników muszą być przechowywane w formie zaszyfrowanej.
+- **Bezpieczeństwo:** Hasła użytkowników muszą być przechowywane w formie zaszyfrowanej (jeśli zostanie dodane zarządzanie użytkownikami).
 - **Dostępność:** Aplikacja powinna działać na popularnych przeglądarkach (Chrome, Firefox, Edge).
+- **Testy:** Pokrycie testami nie jest pełne, ale będzie rozwijane w przyszłości.
 
 ---
 
 ## Roadmapa rozwoju
 
-1. **Etap 1:** Implementacja podstawowych funkcji MVP (zarządzanie użytkownikami, dodawanie materiałów, odtwarzacz wideo, komentarze).
-2. **Etap 2:** Testy funkcjonalne i użyteczności.
-3. **Etap 3:** Publikacja projektu na GitHub jako open-source.
+1. **Etap 1:** Implementacja podstawowych funkcji MVP (chatbot, kanały, kursy, lekcje).
+2. **Etap 2:** Rozwój kolejnych funkcji opisanych w tym dokumencie.
+3. **Etap 3:** Testy funkcjonalne i użyteczności.
+4. **Etap 4:** Publikacja projektu na GitHub jako open-source.
 
 ---
 
@@ -117,3 +117,4 @@ Obecne platformy, takie jak Circle.so, są kosztowne i wymagają comiesięcznych
 - Instrukcja instalacji aplikacji na własnym serwerze.
 - Dokumentacja API (jeśli dotyczy).
 - Przewodnik dla administratorów i użytkowników.
+
